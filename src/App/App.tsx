@@ -6,6 +6,8 @@ import {
   Route,
 } from "react-router-dom";
 
+import Home from '../Pages/Home';
+
 import { StyledLink, Container } from './styles';
 
 function App() {
@@ -15,20 +17,18 @@ function App() {
         <Box style={{
           background: '#333',
           width: '100%',
-          paddingTop: '20px',
-          paddingBottom: '20px',
           marginBottom: '20px',
           boxShadow: '0 0 10px rgba(0,0,0,.25)'
         }}>
           <Container>
             <StyledLink to="/">Home</StyledLink>
-            <StyledLink to="/indexes">Indexes</StyledLink>
+            <StyledLink to="/endpoints">Search Endpoints</StyledLink>
           </Container>
         </Box>
         <Container>
           <Routes>
-            <Route path="/" element={<>Hello</>} />
-            <Route path="/indexes" element={<>Indexes</>} />
+            <Route path="/" element={<Home />} />
+            <Route path="/endpoints" element={<>Search Endpoints</>} />
           </Routes>
         </Container>
       </div>
