@@ -3,7 +3,9 @@ import Card from '@mui/material/Card';
 import CardContent from '@mui/material/CardContent';
 import Typography from '@mui/material/Typography';
 import Grid from '@mui/material/Grid';
-
+import {
+    Link
+  } from "react-router-dom";
 interface Index {
     uid: string;
     createdAt: string;
@@ -31,16 +33,20 @@ function Home(): React.ReactElement {
             {
                 indexes.map(index => (
                     <Grid item xs={6}>
-                        <Card>
-                            <CardContent>
-                                <Typography variant="h5" component="div">
-                                    { index?.uid || "Name" }
-                                </Typography>
-                                <Typography variant="body2" component="div">
-                                    Last Updated: { new Date(index?.updatedAt).toLocaleDateString() }
-                                </Typography>
-                            </CardContent>
-                        </Card>
+                        <Link style={{
+                            textDecoration: 'none'
+                        }} to={`/index/${index?.uid}`}>
+                            <Card>
+                                <CardContent>
+                                    <Typography variant="h5" component="div">
+                                        { index?.uid || "Name" }
+                                    </Typography>
+                                    <Typography variant="body2" component="div">
+                                        Last Updated: { new Date(index?.updatedAt).toLocaleDateString() }
+                                    </Typography>
+                                </CardContent>
+                            </Card>
+                        </Link>
                     </Grid>
                 ))
             }

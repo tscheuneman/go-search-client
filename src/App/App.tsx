@@ -7,6 +7,7 @@ import {
 } from "react-router-dom";
 
 import Home from '../Pages/Home';
+import Index from '../Pages/Index';
 
 import { StyledLink, Container } from './styles';
 
@@ -28,6 +29,7 @@ function App() {
         <Container>
           <Routes>
             <Route path="/" element={<Home />} />
+            <Route path="/index/:id" element={<Index />} />
             <Route path="/endpoints" element={<>Search Endpoints</>} />
           </Routes>
         </Container>
