@@ -20,7 +20,6 @@ function Home(): React.ReactElement {
         fetch('http://localhost/admin/index').then(res => res.json()).then(response => {
             setIndexes(response);
         }).catch(err => console.error(err));
-        console.log('load page props');
     }, []);
 
     return (
