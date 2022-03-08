@@ -1,6 +1,8 @@
 import React, { useEffect, useState } from 'react';
 import Typography from '@mui/material/Typography';
 import Grid from '@mui/material/Grid';
+import Button from '@mui/material/Button';
+
 import {
     useParams
   } from "react-router-dom";
@@ -35,6 +37,22 @@ function Index(): React.ReactElement {
         mutator(value.split('\n'));
     }
 
+    const saveConfig = () => {
+        const saveRequest = {
+            config: {
+                displayed_fields: displayFields,
+                searchable_fields: searchableFields,
+                filterable_fields: filterableFields,
+                sortable_fields: sortableFields,
+            }
+        };
+
+        fetch(`http://localhost/admin/index/${indexId}/configure/globals`, { method: "POST", body: JSON.stringify(saveRequest), headers: {
+            'Content-Type': 'application/json'
+        } }).then(res => res.json()).then(response => {
+        }).catch(err => console.error(err));
+    };
+
     return (
         <>
             <Typography variant="h5" component="div">
@@ -58,6 +76,10 @@ function Index(): React.ReactElement {
                     <TextEditor setItems={setItems} mutator={setSortableFields} state={sortableFields} heading='Sortable Fields' />
                 </Grid>
             </Grid>
+            <hr />
+            <br />
+            <Button onClick={saveConfig} variant="contained">Save</Button>
+
         </>
     );
 }
