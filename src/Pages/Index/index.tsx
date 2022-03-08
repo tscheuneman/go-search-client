@@ -1,16 +1,15 @@
 import React, { useEffect, useState } from 'react';
-import Card from '@mui/material/Card';
-import CardContent from '@mui/material/CardContent';
 import Typography from '@mui/material/Typography';
 import Grid from '@mui/material/Grid';
 import {
     useParams
   } from "react-router-dom";
 
-import { DragAndDrop } from '../../Components/DragAndDrop';
+import { ConfigValues } from './types';
+import { TextEditor } from '../../Components/TextEditor';
 
 function Index(): React.ReactElement {
-    const [document, setDocument] = useState<Set<string>>();
+    const [fields, setFields] = useState<Set<string>>();
     const { id: indexId } = useParams();
     useEffect(() => {
         fetch(`http://localhost/admin/index/${indexId}/document?limit=1`).then(res => res.json()).then(response => {
@@ -19,8 +18,8 @@ function Index(): React.ReactElement {
                 Object.keys(response[0]).forEach(key => {
                     tmpSet.add(key);
                 });
-                console.log('SetWords', document)
-                setDocument(tmpSet);
+                console.log('SetWords', fields)
+                setFields(tmpSet);
             }
         }).catch(err => console.error(err));
         console.log('load page props');
@@ -34,7 +33,7 @@ function Index(): React.ReactElement {
             <hr />
             <Grid style={{ marginBottom: '20px' }} container spacing={2}>
                 <Grid item xs={6}>
-                    <DragAndDrop heading='Displayed Fields' />
+                    <TextEditor heading='Displayed Fields' type={ConfigValues.SEARCH_CONFIG} />
                 </Grid>
                 <Grid item xs={6}>
                     <Typography variant="h6" component="div">
