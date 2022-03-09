@@ -8,6 +8,7 @@ import {
 
 import Home from '../Pages/Home';
 import Index from '../Pages/Index';
+import Searches from '../Pages/Searches';
 
 import { StyledLink, Container } from './styles';
 
@@ -23,14 +24,13 @@ function App() {
         }}>
           <Container>
             <StyledLink to="/">Home</StyledLink>
-            <StyledLink to="/endpoints">Search Endpoints</StyledLink>
           </Container>
         </Box>
         <Container>
           <Routes>
             <Route path="/" element={<Home />} />
             <Route path="/index/:id" element={<Index />} />
-            <Route path="/endpoints" element={<>Search Endpoints</>} />
+            <Route path="/index/:id/search/:search_slug" element={<Searches />} />
           </Routes>
         </Container>
       </div>

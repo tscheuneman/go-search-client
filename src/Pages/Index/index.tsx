@@ -2,9 +2,12 @@ import React, { useEffect, useState } from 'react';
 import Typography from '@mui/material/Typography';
 import Grid from '@mui/material/Grid';
 import Button from '@mui/material/Button';
+import Card from '@mui/material/Card';
+import CardContent from '@mui/material/CardContent';
 
 import {
-    useParams
+    useParams,
+    Link
   } from "react-router-dom";
 
 import { ConfigValues } from './types';
@@ -16,13 +19,15 @@ function Index(): React.ReactElement {
     const [filterableFields, setFilterableFields] = useState<string[]>([]);
     const [sortableFields, setSortableFields] = useState<string[]>([]);
 
+    const [searches, setSearches] = useState([]);
+
     const { id: indexId } = useParams();
     useEffect(() => {
         fetch(`http://localhost/admin/index/${indexId}/configure/globals`).then(res => res.json()).then(response => {
             const searchableResponse: string[] = response[ConfigValues.SEARCH_CONFIG] || ["*"];
-            const displayResponse: string[] = response[ConfigValues.DISPLAY_CONFIG] || ["*"];;
-            const filterableResponse: string[] = response[ConfigValues.FILTERABLE_CONFIG] || [];;
-            const sortableResponse: string[] = response[ConfigValues.SORTABLE_CONFIG] || [];;
+            const displayResponse: string[] = response[ConfigValues.DISPLAY_CONFIG] || ["*"];
+            const filterableResponse: string[] = response[ConfigValues.FILTERABLE_CONFIG] || [];
+            const sortableResponse: string[] = response[ConfigValues.SORTABLE_CONFIG] || [];
 
             setSearchableFields(searchableResponse)
             setDisplayFields(displayResponse)
@@ -30,6 +35,10 @@ function Index(): React.ReactElement {
             setSortableFields(sortableResponse);
 
         }).catch(err => console.error(err));
+
+        fetch(`http://localhost/admin/index/${indexId}/configure/search`).then(res => res.json()).then(response => {
+            setSearches(response || [])
+            }).catch(err => console.error(err));
     }, []);
 
     const setItems = (event: React.ChangeEvent<HTMLTextAreaElement>, mutator: React.Dispatch<React.SetStateAction<any>>) => {
@@ -79,7 +88,39 @@ function Index(): React.ReactElement {
             <hr />
             <br />
             <Button onClick={saveConfig} variant="contained">Save</Button>
-
+            <br />
+            <br />
+            <hr />
+            <br />
+            <Typography variant="h5" component="div">
+                Search Indexes
+            </Typography>
+            <Grid style={{ marginBottom: '20px' }} container spacing={2}>
+                <Grid item xs={12}>
+                    {
+                        searches.map((search: any) => {
+                            return(
+                                <Link style={{
+                                    textDecoration: 'none'
+                                }} to={`/index/${indexId}/search/${search?.Slug}`}>
+                                <Card style={{
+                                    marginTop: '20px'
+                                }}>
+                                    <CardContent>
+                                        <Typography variant="h5" component="div">
+                                             { search?.Slug || "Name" }
+                                        </Typography>
+                                        <Typography variant="body2" component="div">
+                                            Last Updated: { new Date(search?.UpdatedAt).toLocaleDateString() }
+                                        </Typography>
+                                    </CardContent>
+                                </Card>
+                            </Link>
+                            )
+                        })
+                    }
+                </Grid>
+            </Grid>
         </>
     );
 }
