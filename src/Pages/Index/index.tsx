@@ -4,6 +4,7 @@ import Grid from '@mui/material/Grid';
 import Button from '@mui/material/Button';
 import Card from '@mui/material/Card';
 import CardContent from '@mui/material/CardContent';
+import CircularProgress from '@mui/material/CircularProgress';
 
 import {
     useParams,
@@ -13,17 +14,20 @@ import {
 import { ConfigValues } from './types';
 import { TextEditor } from '../../Components/TextEditor';
 
+import { ApiRequest } from '../../utils/apiRequest';
+
 function Index(): React.ReactElement {
     const [searchableFields, setSearchableFields] = useState<string[]>([]);
     const [displayFields, setDisplayFields] = useState<string[]>([]);
     const [filterableFields, setFilterableFields] = useState<string[]>([]);
     const [sortableFields, setSortableFields] = useState<string[]>([]);
+    const [loading, setLoading] = useState<boolean>(false);
 
     const [searches, setSearches] = useState([]);
 
     const { id: indexId } = useParams();
     useEffect(() => {
-        fetch(`http://localhost/admin/index/${indexId}/configure/globals`).then(res => res.json()).then(response => {
+        ApiRequest(`/admin/index/${indexId}/configure/globals`, (response) => {
             const searchableResponse: string[] = response[ConfigValues.SEARCH_CONFIG] || ["*"];
             const displayResponse: string[] = response[ConfigValues.DISPLAY_CONFIG] || ["*"];
             const filterableResponse: string[] = response[ConfigValues.FILTERABLE_CONFIG] || [];
@@ -33,12 +37,11 @@ function Index(): React.ReactElement {
             setDisplayFields(displayResponse)
             setFilterableFields(filterableResponse);
             setSortableFields(sortableResponse);
+        });
 
-        }).catch(err => console.error(err));
-
-        fetch(`http://localhost/admin/index/${indexId}/configure/search`).then(res => res.json()).then(response => {
+        ApiRequest(`/admin/index/${indexId}/configure/search`, (response) => {
             setSearches(response || [])
-            }).catch(err => console.error(err));
+        });
     }, []);
 
     const setItems = (event: React.ChangeEvent<HTMLTextAreaElement>, mutator: React.Dispatch<React.SetStateAction<any>>) => {
@@ -56,17 +59,74 @@ function Index(): React.ReactElement {
             }
         };
 
-        fetch(`http://localhost/admin/index/${indexId}/configure/globals`, { method: "POST", body: JSON.stringify(saveRequest), headers: {
-            'Content-Type': 'application/json'
-        } }).then(res => res.json()).then(response => {
-        }).catch(err => console.error(err));
+        ApiRequest(`/admin/index/${indexId}/configure/globals`, () => {}, {
+            method: 'POST',
+            body: JSON.stringify(saveRequest),
+            headers: {
+                'Content-Type': 'application/json'
+            }
+        });
     };
+
+    const handleFileUpload = (evt: any) => {
+        setLoading(true);
+        const target = evt.target;
+        if(target?.files?.[0]) {
+            const fileReader = new FileReader();
+
+            fileReader.addEventListener("load", () => {
+                const result = fileReader?.result || '';
+                const JsonResult = JSON.parse(result as string);
+                ApiRequest(`/admin/index/${indexId}/document`, () => {
+                    setLoading(false);
+                }, {
+                    method: 'POST',
+                    body: JSON.stringify({ documents: JsonResult }),
+                    headers: {
+                        'Content-Type': 'application/json'
+                    }
+                });
+            }, false);
+
+            fileReader.readAsText(target?.files?.[0]);
+        }
+    }
 
     return (
         <>
-            <Typography variant="h5" component="div">
-                Configure { indexId }
-            </Typography>
+            <Grid style={{ marginBottom: '20px' }} container spacing={2}>
+                <Grid item xs={6}>
+                    <Typography variant="h5" component="div">
+                        Configure { indexId }
+                    </Typography>
+                </Grid>
+                <Grid style={{
+                    display: 'flex',
+                    justifyContent: 'end'
+                }} 
+                item xs={6}>
+                    {
+                        loading
+                        ?
+                            <CircularProgress size={20} />
+                        :
+                            <Button
+                            variant="contained"
+                            component="label"
+                            >
+                                Upload File
+                                <input
+                                    accept="application/json"
+                                    type="file"
+                                    onChange={handleFileUpload}
+                                    hidden
+                                />
+                            </Button>
+                    }
+
+                </Grid>
+            </Grid>
+
             <hr />
             <Grid style={{ marginBottom: '20px' }} container spacing={2}>
                 <Grid item xs={6}>
