@@ -25,7 +25,7 @@ function Login(): React.ReactElement {
                 }
             };
     
-            ApiRequest('/login', (response) => { console.log(response) }, {
+            ApiRequest('/login', () => { window.location.assign('/') }, {
                 method: 'POST',
                 body: JSON.stringify(loginData),
                 headers: {
