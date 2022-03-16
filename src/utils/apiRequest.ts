@@ -17,9 +17,8 @@ const DEFAULT_SETTINGS: ApiOptions = {
 export const ApiRequest = (path: string, callback: (response: any) => void, options?: ApiOptions,) => {
     const requestOptions = { ...DEFAULT_SETTINGS, ...options };
     fetch(`${process.env.REACT_APP_URL_ROOT}${path}`, requestOptions).then(res => {
-        if(res.status === 200) {
+        if(res.status >= 200 && res.status < 300) {
             res.json().then(response => {
-                console.log(response);
                 callback(response);
             });
         } else {
@@ -28,6 +27,7 @@ export const ApiRequest = (path: string, callback: (response: any) => void, opti
                     EventBus.trigger(EVENTS.NAVIGATE, '/login');
                     break;
             }
+            throw Error("Failed Api Call")
         }
 
     }).catch(err => {
