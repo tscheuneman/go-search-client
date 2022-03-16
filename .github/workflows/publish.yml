@@ -12,13 +12,10 @@ jobs:
     steps:
     - uses: actions/checkout@master
     - name: Publish to Registry
-      uses: elgohr/Publish-Docker-Github-Action@master
+      uses: VaultVulp/gp-docker-action@1.2.0
       env:
         ENV: PROD
       with:
-        name: docker.pkg.github.com/tscheuneman/go-search/client
-        username: ${{ secrets.DOCKER_USERNAME }}
-        password: ${{ secrets.DOCKER_PASSWORD }}
-        registry: docker.pkg.github.com
-        context: ${{ github.workspace }}
-        dockerfile: ${{ github.workspace }}/deploy/Dockerfile
+        image-name: go-search/client
+        github-token: ${{ secrets.DOCKER_PASSWORD }}
+        dockerfile: ${{ github.workspace }}/Provisioning/go.prod.dockerfile
