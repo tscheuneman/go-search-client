@@ -21,4 +21,4 @@ jobs:
         password: ${{ secrets.DOCKER_PASSWORD }}
         registry: docker.pkg.github.com
         context: ${{ github.workspace }}
-        dockerfile: ${{ github.workspace }}/deploy/node.prod.dockerfile
+        dockerfile: ${{ github.workspace }}/deploy/Dockerfile
