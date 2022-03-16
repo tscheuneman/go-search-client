@@ -2,10 +2,14 @@ import React, { useEffect, useState } from 'react';
 import Card from '@mui/material/Card';
 import CardContent from '@mui/material/CardContent';
 import Typography from '@mui/material/Typography';
+import Button from '@mui/material/Button';
+import AddIcon from '@mui/icons-material/Add';
 import Grid from '@mui/material/Grid';
 import {
     Link
   } from "react-router-dom";
+
+import { ModalForm } from '../../Components/ModalForm';
 
 import { ApiRequest } from '../../utils/apiRequest';
 
@@ -18,18 +22,53 @@ interface Index {
 
 function Home(): React.ReactElement {
     const [indexes, setIndexes] = useState<Index[]>([]);
-
+    const [open, setOpen] = useState<boolean>(false);
     useEffect(() => {
+        getIndexes();
+    }, []);
+
+    const getIndexes = () => {
         ApiRequest('/admin/index', (response) => {
             setIndexes(response);
         });
-    }, []);
+    }
+
+    const handleOnSubmit = (value: Record<string, string>) => {
+        ApiRequest('/admin/index', (response) => {
+            getIndexes();
+            setOpen(false)
+        }, {
+            method: 'POST',
+            body: JSON.stringify(value),
+            headers: {
+                'Content-Type': 'application/json'
+            }
+
+        });
+    }
 
     return (
         <>
-            <Typography variant="h4" component="div">
-                Indexes
-            </Typography>
+            <Grid container spacing={2}>
+                <Grid item xs={6}>
+                    <Typography variant="h4" component="div">
+                        Indexes
+                    </Typography>
+                </Grid>
+                <Grid style={{
+                    display: 'flex',
+                    justifyContent: 'end'
+                }}
+                item xs={6}>
+                    <Button
+                        variant="contained"
+                        component="label"
+                        onClick={() => setOpen(true)}
+                        >
+                        <AddIcon /> Add Index
+                    </Button>
+                </Grid>
+            </Grid>
             <br />
             <Grid container spacing={2}>
             {
@@ -53,6 +92,15 @@ function Home(): React.ReactElement {
                 ))
             }
             </Grid>
+            <ModalForm
+                heading='Add an Index'
+                open={open}
+                setOpen={setOpen}
+                fields={[{
+                    name: 'slug'
+                }]}
+                onSubmit={handleOnSubmit}
+            />
         </>
     );
 }

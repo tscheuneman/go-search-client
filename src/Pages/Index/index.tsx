@@ -5,6 +5,7 @@ import Button from '@mui/material/Button';
 import Card from '@mui/material/Card';
 import CardContent from '@mui/material/CardContent';
 import CircularProgress from '@mui/material/CircularProgress';
+import AddIcon from '@mui/icons-material/Add';
 
 import {
     useParams,
@@ -13,6 +14,7 @@ import {
 
 import { ConfigValues } from './types';
 import { TextEditor } from '../../Components/TextEditor';
+import { ModalForm } from '../../Components/ModalForm';
 
 import { ApiRequest } from '../../utils/apiRequest';
 
@@ -24,6 +26,8 @@ function Index(): React.ReactElement {
     const [loading, setLoading] = useState<boolean>(false);
 
     const [searches, setSearches] = useState([]);
+
+    const [open, setOpen] = useState<boolean>(false);
 
     const { id: indexId } = useParams();
     useEffect(() => {
@@ -38,15 +42,19 @@ function Index(): React.ReactElement {
             setFilterableFields(filterableResponse);
             setSortableFields(sortableResponse);
         });
+        setSearchEndpoints();
 
-        ApiRequest(`/admin/index/${indexId}/configure/search`, (response) => {
-            setSearches(response || [])
-        });
     }, []);
 
     const setItems = (event: React.ChangeEvent<HTMLTextAreaElement>, mutator: React.Dispatch<React.SetStateAction<any>>) => {
         const value = event.target.value;
         mutator(value.split('\n'));
+    }
+
+    const setSearchEndpoints = () => {
+        ApiRequest(`/admin/index/${indexId}/configure/search`, (response) => {
+            setSearches(response || [])
+        });
     }
 
     const saveConfig = () => {
@@ -90,6 +98,22 @@ function Index(): React.ReactElement {
 
             fileReader.readAsText(target?.files?.[0]);
         }
+    }
+
+    const handleOnSubmit = (value: Record<string, string>) => {
+        ApiRequest(`/admin/index/${indexId}/configure/search`, (response) => {
+            setSearchEndpoints();
+            setOpen(false)
+        }, {
+            method: 'POST',
+            body: JSON.stringify({ config: {
+                ...value,
+            } }),
+            headers: {
+                'Content-Type': 'application/json'
+            }
+
+        });
     }
 
     return (
@@ -152,9 +176,27 @@ function Index(): React.ReactElement {
             <br />
             <hr />
             <br />
-            <Typography variant="h5" component="div">
-                Search Indexes
-            </Typography>
+            <Grid container spacing={2}>
+                <Grid item xs={6}>
+                <Typography variant="h5" component="div">
+                    Search Indexes
+                </Typography>
+                </Grid>
+                <Grid style={{
+                    display: 'flex',
+                    justifyContent: 'end'
+                }}
+                item xs={6}>
+                    <Button
+                        variant="contained"
+                        component="label"
+                        onClick={() => setOpen(true)}
+                        >
+                        <AddIcon /> Add Endpoint
+                    </Button>
+                </Grid>
+            </Grid>
+
             <Grid style={{ marginBottom: '20px' }} container spacing={2}>
                 <Grid item xs={12}>
                     {
@@ -181,6 +223,15 @@ function Index(): React.ReactElement {
                     }
                 </Grid>
             </Grid>
+            <ModalForm
+                heading='Add a Search Endpoint'
+                open={open}
+                setOpen={setOpen}
+                fields={[{
+                    name: 'slug'
+                }]}
+                onSubmit={handleOnSubmit}
+            />
         </>
     );
 }
