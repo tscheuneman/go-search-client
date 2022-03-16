@@ -17,4 +17,5 @@ RUN ls
 RUN npm run build
 
 EXPOSE ${SERVICE_PORT}
-CMD ["serve", "./build", "-l $SERVICE_PORT"]
+
+CMD serve ./build -l ${SERVICE_PORT}
