@@ -1,7 +1,7 @@
 import EventBus from './eventbus';
 import { EVENTS } from '../constants';
 
-type ApiMethod = "GET" | "POST";
+type ApiMethod = "GET" | "POST" | "DELETE";
 interface ApiOptions {
     method?: ApiMethod,
     body?: any;

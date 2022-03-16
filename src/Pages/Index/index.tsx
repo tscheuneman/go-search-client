@@ -6,6 +6,7 @@ import Card from '@mui/material/Card';
 import CardContent from '@mui/material/CardContent';
 import CircularProgress from '@mui/material/CircularProgress';
 import AddIcon from '@mui/icons-material/Add';
+import DeleteIcon from '@mui/icons-material/Delete';
 
 import {
     useParams,
@@ -15,8 +16,11 @@ import {
 import { ConfigValues } from './types';
 import { TextEditor } from '../../Components/TextEditor';
 import { ModalForm } from '../../Components/ModalForm';
+import { ConfirmDelete } from '../../Components/ConfirmDelete';
 
+import EventBus from '../../utils/eventbus';
 import { ApiRequest } from '../../utils/apiRequest';
+import { EVENTS } from '../../constants';
 
 function Index(): React.ReactElement {
     const [searchableFields, setSearchableFields] = useState<string[]>([]);
@@ -28,6 +32,7 @@ function Index(): React.ReactElement {
     const [searches, setSearches] = useState([]);
 
     const [open, setOpen] = useState<boolean>(false);
+    const [openDialog, setOpenDialog] = useState<boolean>(false);
 
     const { id: indexId } = useParams();
     useEffect(() => {
@@ -116,10 +121,30 @@ function Index(): React.ReactElement {
         });
     }
 
+    const handleDeleteIndex = () => {
+        ApiRequest(`/admin/index/${indexId}`, (response) => {
+            setOpenDialog(false);
+            EventBus.trigger(EVENTS.NAVIGATE, '/');
+        }, {
+            method: 'DELETE',
+            headers: {
+                'Content-Type': 'application/json'
+            }
+
+        });
+    }
+
     return (
         <>
             <Grid style={{ marginBottom: '20px' }} container spacing={2}>
                 <Grid item xs={6}>
+                    <Button color="error" style={{
+                        float: 'left'
+                    }}
+                    onClick={() => { setOpenDialog(true) }}
+                    >
+                        <DeleteIcon />
+                    </Button>
                     <Typography variant="h5" component="div">
                         Configure { indexId }
                     </Typography>
@@ -231,6 +256,13 @@ function Index(): React.ReactElement {
                     name: 'slug'
                 }]}
                 onSubmit={handleOnSubmit}
+            />
+            <ConfirmDelete
+                heading="Delete?"
+                open={openDialog}
+                setOpen={setOpenDialog}
+                handleNo={() => { setOpenDialog(false) }}
+                handleYes={handleDeleteIndex}
             />
         </>
     );
