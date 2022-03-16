@@ -1,6 +1,5 @@
 FROM node:12-alpine
 ENV enviorment ${ENV}
-ENV SERVICE_PORT 3000
 
 WORKDIR /var/www
 
@@ -12,10 +11,6 @@ COPY ./ .
 
 RUN npm install -g serve
 
-RUN ls
+EXPOSE 8080
 
-RUN npm run build
-
-EXPOSE ${SERVICE_PORT}
-
-CMD serve ./build -l ${SERVICE_PORT}
+CMD npm run build && serve ./build -l 8080
