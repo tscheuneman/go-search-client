@@ -14,7 +14,7 @@ const DEFAULT_SETTINGS: ApiOptions = {
     credentials: 'include',
 }
 
-export const ApiRequest = (path: string, callback: (response: any) => void, options?: ApiOptions,) => {
+export const ApiRequest = (path: string, callback: (response: any) => void, options?: ApiOptions, failureCb?: () => void) => {
     const requestOptions = { ...DEFAULT_SETTINGS, ...options };
     fetch(`${process.env.REACT_APP_URL_ROOT}${path}`, requestOptions).then(res => {
         if(res.status >= 200 && res.status < 300) {
@@ -33,5 +33,8 @@ export const ApiRequest = (path: string, callback: (response: any) => void, opti
     }).catch(err => {
         EventBus.trigger(EVENTS.API_ERROR)
         console.error(err)
+        if(failureCb) {
+            failureCb();
+        }
     });
 }
