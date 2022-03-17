@@ -17,6 +17,7 @@ export interface ModalFormProps {
 
 export interface ModalFormFieldInterface {
     name: string;
+    type?: string;
 }
 
 export const ModalForm = ({ heading, open, setOpen, fields, onSubmit }: ModalFormProps) => {
@@ -31,7 +32,7 @@ export const ModalForm = ({ heading, open, setOpen, fields, onSubmit }: ModalFor
     const handleFieldChange = (evt: React.ChangeEvent<HTMLInputElement>, field: string) => {
         const value = evt.target.value;
         setFormFields({
-            ...setFormFields,
+            ...formFields,
             [field]: value,
         });
     }
@@ -57,13 +58,18 @@ export const ModalForm = ({ heading, open, setOpen, fields, onSubmit }: ModalFor
                         </Typography>
                     </Grid>
                     <Grid item xs={12}>
-                        {Object.keys(formFields).map(field => {
+                        {fields.map(field => {
                             return (
                                 <TextField 
-                                    onChange={(evt: React.ChangeEvent<HTMLInputElement>) => handleFieldChange(evt, field)} 
-                                    key={field}
-                                    label={field}
-                                    value={formFields[field]}
+                                    onChange={(evt: React.ChangeEvent<HTMLInputElement>) => handleFieldChange(evt, field.name)} 
+                                    key={field?.name}
+                                    label={field.name}
+                                    value={formFields[field.name]}
+                                    type={field?.type}
+                                    style={{
+                                        display: 'block',
+                                        marginBottom: '10px',
+                                    }}
                                 />
                             )
                         })}

@@ -10,6 +10,7 @@ import Home from '../Pages/Home';
 import Index from '../Pages/Index';
 import Searches from '../Pages/Searches';
 import Login from '../Pages/Login';
+import Users from '../Pages/Users';
 
 import EventBus from '../utils/eventbus';
 import { EVENTS } from '../constants';
@@ -34,6 +35,7 @@ function App() {
         }}>
           <Container>
             <StyledLink to="/">Home</StyledLink>
+            <StyledLink to="/users">Users</StyledLink>
           </Container>
         </Box>
         <Container>
@@ -42,6 +44,8 @@ function App() {
             <Route path="/login" element={<Login />} />
             <Route path="/index/:id" element={<Index />} />
             <Route path="/index/:id/search/:search_slug" element={<Searches />} />
+            <Route path="/users" element={<Users />} />
+            <Route path="*" element={<>Pages doesn't exist</>} />
           </Routes>
         </Container>
       </div>
