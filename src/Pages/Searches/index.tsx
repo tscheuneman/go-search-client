@@ -2,10 +2,14 @@ import React, { useEffect, useState } from 'react';
 import Typography from '@mui/material/Typography';
 import Grid from '@mui/material/Grid';
 import Button from '@mui/material/Button';
-import Card from '@mui/material/Card';
-import CardContent from '@mui/material/CardContent';
+import DeleteIcon from '@mui/icons-material/Delete';
 
 import { TextEditor } from '../../Components/TextEditor';
+import { ConfirmDelete } from '../../Components/ConfirmDelete';
+
+import EventBus from '../../utils/eventbus';
+import { EVENTS } from '../../constants';
+
 import { ApiRequest } from '../../utils/apiRequest';
 
 import {
@@ -23,6 +27,7 @@ function Searches(): React.ReactElement {
     const [displayFields, setDisplayFields] = useState<string[]>([]);
     const [highlightFields, setHighlightFields] = useState<string[]>([]);
 
+    const [openDialog, setOpenDialog] = useState<boolean>(false);
 
     useEffect(() => {
         ApiRequest(`/admin/index/${indexId}/configure/search/${searchSlug}`, (response) => {
@@ -62,8 +67,28 @@ function Searches(): React.ReactElement {
         });
     };
 
+    const handleDeleteSearch = () => {
+        ApiRequest(`/admin/index/${indexId}/configure/search/${searchSlug}`, (response) => {
+            setOpenDialog(false);
+            EventBus.trigger(EVENTS.NAVIGATE, `/index/${indexId}`);
+        }, {
+            method: 'DELETE',
+            headers: {
+                'Content-Type': 'application/json'
+            }
+
+        });
+    }
+
     return (
         <>
+            <Button color="error" style={{
+                float: 'left'
+            }}
+            onClick={() => { setOpenDialog(true) }}
+            >
+                <DeleteIcon />
+            </Button>
             <Typography variant="h5" component="div">
                 Configure { searchSlug }
             </Typography>
@@ -86,6 +111,13 @@ function Searches(): React.ReactElement {
             <hr />
             <br />
             <Button onClick={saveConfig} variant="contained">Save</Button>
+            <ConfirmDelete
+                heading="Delete?"
+                open={openDialog}
+                setOpen={setOpenDialog}
+                handleNo={() => { setOpenDialog(false) }}
+                handleYes={handleDeleteSearch}
+            />
         </>
     );
 }
