@@ -3,11 +3,11 @@ import React, { useEffect, useState } from 'react';
 import Typography from '@mui/material/Typography';
 import Grid from '@mui/material/Grid';
 import Button from '@mui/material/Button';
-import Box from '@mui/material/Button';
 import Card from '@mui/material/Card';
 import CardContent from '@mui/material/CardContent';
 import AddIcon from '@mui/icons-material/Add';
 import DeleteIcon from '@mui/icons-material/Delete';
+import KeyIcon from '@mui/icons-material/Key';
 
 import { ModalForm } from '../../Components/ModalForm';
 import { ConfirmDelete } from '../../Components/ConfirmDelete';
@@ -23,6 +23,7 @@ import { ApiRequest } from '../../utils/apiRequest';
 import { EVENTS } from '../../constants';
 
 function Users(): React.ReactElement {
+    const [changePwModal, setChangePwModal] = useState(false);
     const [open, setOpen] = useState(false);
     const [openDialog, setOpenDialog] = useState(false);
     const [users, setUsers] = useState([]);
@@ -50,16 +51,35 @@ function Users(): React.ReactElement {
                 'Content-Type': 'application/json'
             }
 
+        }, () => {
+            setOpenDialog(false);
         });
     }
 
     const handleDeleteUser = () => {
-        console.log(userId);
         ApiRequest(`/admin/users/${userId}`, (response) => {
             setOpenDialog(false);
             EventBus.trigger(EVENTS.NAVIGATE, '/users');
         }, {
             method: 'DELETE',
+            headers: {
+                'Content-Type': 'application/json'
+            }
+
+        }, () => {
+            setOpenDialog(false);
+        });
+    }
+    
+    const handleEditPw = (values: Record<string, string>) => {
+        console.log(userId);
+        console.log('chngePw', values);
+        ApiRequest(`/admin/users/${userId}/password`, (response) => {
+            setChangePwModal(false);
+            EventBus.trigger(EVENTS.NAVIGATE, '/users');
+        }, {
+            method: 'POST',
+            body: JSON.stringify(values),
             headers: {
                 'Content-Type': 'application/json'
             }
@@ -111,9 +131,15 @@ function Users(): React.ReactElement {
                                                 justifyContent: 'end'
                                             }} item xs={6}>
                                                     {isAuthed &&
-                                                         <Button color="error" onClick={() => { setOpenDialog(true) }}>
+                                                    <>
+                                                        <Button color="error" onClick={() => { setOpenDialog(true) }}>
                                                             <DeleteIcon />
                                                         </Button>
+                                                        <Button color="primary" onClick={() => { setChangePwModal(true) }}>
+                                                            <KeyIcon />
+                                                        </Button>
+                                                    </>
+
                                                     }
                                             </Grid>
                                         </Grid>
@@ -138,6 +164,18 @@ function Users(): React.ReactElement {
                 }
                 ]}
                 onSubmit={handleAddUser}
+            />
+            <ModalForm
+                heading='Change Your Password'
+                open={changePwModal}
+                setOpen={setChangePwModal}
+                fields={[
+                {
+                    name: 'password',
+                    type: 'password'
+                }
+                ]}
+                onSubmit={handleEditPw}
             />
             <ConfirmDelete
                 heading="Delete?"
