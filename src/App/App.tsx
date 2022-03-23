@@ -1,5 +1,8 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import Box from '@mui/material/Box';
+import Snackbar from '@mui/material/Snackbar';
+import Alert from '@mui/material/Alert';
+
 import {
   BrowserRouter as Router,
   Routes,
@@ -17,12 +20,33 @@ import { EVENTS } from '../constants';
 
 import { StyledLink, Container } from './styles';
 
+interface SnackBarProps {
+  open: boolean;
+  message: string;
+}
+
 function App() {
+
+  const [error, setError] = useState<SnackBarProps>({
+    open: false,
+    message: ''
+  });
+
   useEffect(() => {
     EventBus.subscribe(EVENTS.NAVIGATE, (path: string) => {
       window.location.assign(path);
     });
+    EventBus.subscribe(EVENTS.API_ERROR_DISPLAY, (message: string) => {
+      setErrorMessage(message);
+    });
   }, []);
+
+  const setErrorMessage = (message: string) => {
+    setError({
+      open: true,
+      message: message,
+    });
+  }
 
   return (
     <Router>
@@ -47,6 +71,18 @@ function App() {
             <Route path="/users" element={<Users />} />
             <Route path="*" element={<>Pages doesn't exist</>} />
           </Routes>
+          <Snackbar
+            open={error.open}
+            onClose={() => setError({
+              open: false,
+              message: '',
+            })}
+            autoHideDuration={6000}
+          >
+            <Alert severity="error">
+              { error.message }
+            </Alert>
+          </Snackbar>
         </Container>
       </div>
     </Router>

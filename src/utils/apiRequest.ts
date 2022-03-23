@@ -22,17 +22,22 @@ export const ApiRequest = (path: string, callback: (response: any) => void, opti
                 callback(response);
             });
         } else {
-            switch(res.status) {
-                case 403:
-                    EventBus.trigger(EVENTS.NAVIGATE, '/login');
-                    break;
-            }
-            throw Error("Failed Api Call")
+            res.json().then(response => {
+                switch(res.status) {
+                    case 403:
+                        EventBus.trigger(EVENTS.NAVIGATE, '/login');
+                        break;
+                    default:
+                        const message = response.error || response.msg || "Api Error";
+                        EventBus.trigger(EVENTS.API_ERROR_DISPLAY, message);
+                        failureCb && failureCb();
+                        break;
+                }
+                throw Error("Failed Api Call")
+            });
         }
-
     }).catch(err => {
         EventBus.trigger(EVENTS.API_ERROR)
-        console.error(err)
         if(failureCb) {
             failureCb();
         }
