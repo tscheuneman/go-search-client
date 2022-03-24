@@ -29,14 +29,14 @@ function Index(): React.ReactElement {
     const [sortableFields, setSortableFields] = useState<string[]>([]);
     const [loading, setLoading] = useState<boolean>(false);
 
-    const [searches, setSearches] = useState([]);
+    const [searches, setSearches] = useState<any[]>([]);
 
     const [open, setOpen] = useState<boolean>(false);
     const [openDialog, setOpenDialog] = useState<boolean>(false);
 
     const { id: indexId } = useParams();
     useEffect(() => {
-        ApiRequest(`/admin/index/${indexId}/configure/globals`, (response) => {
+        ApiRequest(`/admin/index/${indexId}/configure/globals`, (response: Record<ConfigValues, string[]|undefined>) => {
             const searchableResponse: string[] = response[ConfigValues.SEARCH_CONFIG] || ["*"];
             const displayResponse: string[] = response[ConfigValues.DISPLAY_CONFIG] || ["*"];
             const filterableResponse: string[] = response[ConfigValues.FILTERABLE_CONFIG] || [];
@@ -57,7 +57,7 @@ function Index(): React.ReactElement {
     }
 
     const setSearchEndpoints = () => {
-        ApiRequest(`/admin/index/${indexId}/configure/search`, (response) => {
+        ApiRequest(`/admin/index/${indexId}/configure/search`, (response: any[]|undefined) => {
             setSearches(response || [])
         });
     }
@@ -72,7 +72,7 @@ function Index(): React.ReactElement {
             }
         };
 
-        ApiRequest(`/admin/index/${indexId}/configure/globals`, () => {}, {
+        ApiRequest(`/admin/index/${indexId}/configure/globals`, () => ({}), {
             method: 'POST',
             body: JSON.stringify(saveRequest),
             headers: {
@@ -81,14 +81,14 @@ function Index(): React.ReactElement {
         });
     };
 
-    const handleFileUpload = (evt: any) => {
+    const handleFileUpload = (evt: React.ChangeEvent<HTMLInputElement>) => {
         setLoading(true);
         const target = evt.target;
         if(target?.files?.[0]) {
             const fileReader = new FileReader();
 
             fileReader.addEventListener("load", () => {
-                const result = fileReader?.result || '';
+                const result = fileReader?.result;
                 const JsonResult = JSON.parse(result as string);
                 ApiRequest(`/admin/index/${indexId}/document`, () => {
                     setLoading(false);
@@ -106,7 +106,7 @@ function Index(): React.ReactElement {
     }
 
     const handleOnSubmit = (value: Record<string, string>) => {
-        ApiRequest(`/admin/index/${indexId}/configure/search`, (response) => {
+        ApiRequest(`/admin/index/${indexId}/configure/search`, () => {
             setSearchEndpoints();
             setOpen(false)
         }, {
@@ -122,7 +122,7 @@ function Index(): React.ReactElement {
     }
 
     const handleDeleteIndex = () => {
-        ApiRequest(`/admin/index/${indexId}`, (response) => {
+        ApiRequest(`/admin/index/${indexId}`, () => {
             setOpenDialog(false);
             EventBus.trigger(EVENTS.NAVIGATE, '/');
         }, {
@@ -225,7 +225,7 @@ function Index(): React.ReactElement {
             <Grid style={{ marginBottom: '20px' }} container spacing={2}>
                 <Grid item xs={12}>
                     {
-                        searches.map((search: any) => {
+                        searches.map((search: { Slug?: string, UpdatedAt: string }) => {
                             return(
                                 <Link style={{
                                     textDecoration: 'none'
@@ -238,7 +238,7 @@ function Index(): React.ReactElement {
                                              { search?.Slug || "Name" }
                                         </Typography>
                                         <Typography variant="body2" component="div">
-                                            Last Updated: { new Date(search?.UpdatedAt).toLocaleDateString() }
+                                            Last Updated: { new Date(search.UpdatedAt).toLocaleDateString() }
                                         </Typography>
                                     </CardContent>
                                 </Card>

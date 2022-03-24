@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/strict-boolean-expressions */
 type EventHandler = (...passthroughParams: any) => void;
 
 class EventBus {
@@ -7,7 +8,7 @@ class EventBus {
     this.eventMap = {};
   }
 
-  subscribe(name: string, handler: EventHandler) {
+  subscribe(name: string, handler?: EventHandler) {
     if (name && handler) {
       this.eventMap[name] = this.eventMap[name] || [];
       this.eventMap[name].push(handler);

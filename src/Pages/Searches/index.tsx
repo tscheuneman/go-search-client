@@ -58,7 +58,7 @@ function Searches(): React.ReactElement {
             }
         };
 
-        ApiRequest(`/admin/index/${indexId}/configure/search`, () => {}, {
+        ApiRequest(`/admin/index/${indexId}/configure/search`, () => ({}), {
             method: 'POST',
             body: JSON.stringify(saveRequest),
             headers: {
@@ -68,7 +68,7 @@ function Searches(): React.ReactElement {
     };
 
     const handleDeleteSearch = () => {
-        ApiRequest(`/admin/index/${indexId}/configure/search/${searchSlug}`, (response) => {
+        ApiRequest(`/admin/index/${indexId}/configure/search/${searchSlug}`, () => {
             setOpenDialog(false);
             EventBus.trigger(EVENTS.NAVIGATE, `/index/${indexId}`);
         }, {

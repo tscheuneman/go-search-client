@@ -80,7 +80,7 @@ function Home(): React.ReactElement {
                             <Card>
                                 <CardContent>
                                     <Typography variant="h5" component="div">
-                                        { index?.uid || "Name" }
+                                        { index?.uid }
                                     </Typography>
                                     <Typography variant="body2" component="div">
                                         Last Updated: { new Date(index?.updatedAt).toLocaleDateString() }

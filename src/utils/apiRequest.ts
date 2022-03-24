@@ -1,3 +1,4 @@
+/* eslint-disable no-case-declarations */
 import EventBus from './eventbus';
 import { EVENTS } from '../constants';
 
@@ -28,7 +29,7 @@ export const ApiRequest = (path: string, callback: (response: any) => void, opti
                         EventBus.trigger(EVENTS.NAVIGATE, '/login');
                         break;
                     default:
-                        const message = response.error || response.msg || "Api Error";
+                        const message = response?.error || response?.msg || "Api Error";
                         EventBus.trigger(EVENTS.API_ERROR_DISPLAY, message);
                         failureCb && failureCb();
                         break;
