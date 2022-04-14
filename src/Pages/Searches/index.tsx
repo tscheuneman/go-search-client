@@ -26,19 +26,23 @@ function Searches(): React.ReactElement {
     const [allowedFacets, setAllowedFacets] = useState<string[]>([]);
     const [displayFields, setDisplayFields] = useState<string[]>([]);
     const [highlightFields, setHighlightFields] = useState<string[]>([]);
+    const [combinationFacets, setCombinationFacets] = useState<string[]>([]);
 
     const [openDialog, setOpenDialog] = useState<boolean>(false);
 
     useEffect(() => {
         ApiRequest(`/admin/index/${indexId}/configure/search/${searchSlug}`, (response) => {
+            console.log(response);
             const facetResponse: string[] = response[FieldConfigValues.FACET_CONFIG] || [];
             const displayResponse: string[] = response[FieldConfigValues.DISPLAY_CONFIG] || [];
             const highlightResponse: string[] = response[FieldConfigValues.HIGHLIGHT_CONFIG] || [];
+            const combinationFacetsResponse: string[] = response[FieldConfigValues.COMBINATION_FACETS] || [];
 
             setSearchId(response.Id);
             setAllowedFacets(facetResponse)
             setDisplayFields(displayResponse);
             setHighlightFields(highlightResponse);
+            setCombinationFacets(combinationFacetsResponse)
         });
     }, []);
 
@@ -55,6 +59,7 @@ function Searches(): React.ReactElement {
                 display_fields: displayFields,
                 highlight_fields: highlightFields,
                 allowed_facets: allowedFacets,
+                combination_facets: combinationFacets,
             }
         };
 
@@ -106,6 +111,7 @@ function Searches(): React.ReactElement {
                     <TextEditor setItems={setItems} mutator={setHighlightFields} state={highlightFields} heading='Highlighted Fields' />
                 </Grid>
                 <Grid item xs={6}>
+                    <TextEditor setItems={setItems} mutator={setCombinationFacets} state={combinationFacets} heading='Combination Facets' />
                 </Grid>
             </Grid>
             <hr />
